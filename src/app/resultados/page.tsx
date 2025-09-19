@@ -56,4 +56,6 @@ export default async function ResultadosPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans">
       <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-12 text-center tracking-tight">
-        Resultados del Cuestio
+  Resultados del Cuestionario
+</h1>
+
