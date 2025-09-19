@@ -9,7 +9,7 @@ export default function ChatPage() {
   const expertType = searchParams.get('expert');
   const userName = searchParams.get('user');
 
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<{ type: string; text: string }[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
