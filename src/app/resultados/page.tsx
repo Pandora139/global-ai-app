@@ -60,36 +60,32 @@ export default async function ResultadosPage() {
       </h1>
            <div className="max-w-4xl mx-auto">
         {Object.entries(groupedResponses).map(([userName, userResponses]) => {
-          const responsesList = userResponses as Response[];
+  const responsesList = userResponses as Response[];
+  return (
+    <div key={userName} className="bg-white p-8 rounded-2xl shadow-xl mb-8">
+      <h2 className="text-2xl font-bold text-indigo-600 mb-6 border-b pb-2">
+        Resultados de: {userName}
+      </h2>
+      <div className="space-y-6">
+        {allQuestions.map(q => {
+          const answer = responsesList.find(res => res.question_id === q.id);
           return (
-            <div key={userName} className="bg-white p-8 rounded-2xl shadow-xl mb-8">
-              <h2 className="text-2xl font-bold text-indigo-600 mb-6 border-b pb-2">
-                Resultados de: {userName}
-              </h2>
-              <div className="space-y-6">
-                {allQuestions.map(q => {
-                  const answer = responsesList.find(res => res.question_id === q.id);
-                  return (
-                    <div key={q.id} className="p-4 bg-gray-50 rounded-lg">
-                      <p className="font-semibold text-lg text-gray-700">{q.text}</p>
-                      <p className="mt-2 text-gray-800">
-                        Respuesta: {answer ? answer.answer_text : 'No respondida'}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-8 p-6 bg-green-50 rounded-2xl shadow-inner">
-                <h3 className="text-2xl font-bold text-green-700 mb-4">
-                  Recomendación de carrera
-                </h3>
-                <p className="text-gray-800 whitespace-pre-wrap">{recommendation}</p>
-              </div>
+            <div key={q.id} className="p-4 bg-gray-50 rounded-lg">
+              <p className="font-semibold text-lg text-gray-700">{q.text}</p>
+              <p className="mt-2 text-gray-800">
+                Respuesta: {answer ? answer.answer_text : 'No respondida'}
+              </p>
             </div>
           );
-        ))}
+        })}
+      </div>
+
+      <div className="mt-8 p-6 bg-green-50 rounded-2xl shadow-inner">
+        <h3 className="text-2xl font-bold text-green-700 mb-4">
+          Recomendación de carrera
+        </h3>
+        <p className="text-gray-800 whitespace-pre-wrap">{recommendation}</p>
       </div>
     </div>
   );
-}
+})}
