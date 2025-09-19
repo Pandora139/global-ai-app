@@ -58,4 +58,7 @@ export default async function ResultadosPage() {
       <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-12 text-center tracking-tight">
   Resultados del Cuestionario
 </h1>
+    </div>  {/* cierre del div principal */}
+  );
+}
 
