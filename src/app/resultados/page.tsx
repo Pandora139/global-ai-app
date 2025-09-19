@@ -88,4 +88,4 @@ export default async function ResultadosPage() {
       </div>
     </div>
   );
-})}
+}
