@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { supabaseServer } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 export default function CuestionarioPage() {
@@ -17,7 +17,7 @@ export default function CuestionarioPage() {
     const fetchQuestions = async () => {
       setLoading(true);
 
-      const { data, error } = await supabase
+      const { data: questions, error } = await supabaseServer
         .from('questions')
         .select('*')
         .not('options', 'is', null);
