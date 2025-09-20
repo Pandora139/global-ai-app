@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import OptionMenu from '@/components/OptionMenu'; // Asegúrate de que esta línea esté presente
 
 export default function ChatPage() {
   const searchParams = useSearchParams();
   const expertType = searchParams.get('expert');
   const userName = searchParams.get('user');
 
-  const [messages, setMessages] = useState<{ type: string; text: string }[]>([]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -94,15 +93,11 @@ export default function ChatPage() {
           )}
         </div>
 
-        
         {/* Campo de entrada de texto */}
-        <div className="flex mt-4 items-end">
-          <div className="mr-2">
-            <OptionMenu />
-          </div>
+        <div className="flex mt-4">
           <input
             type="text"
-            className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-ring-indigo-500 transition-colors"
+            className="flex-1 p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
             placeholder="Escribe tu pregunta aquí..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
