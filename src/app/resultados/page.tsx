@@ -25,18 +25,18 @@ export default async function ResultadosPage() {
   }
 
   // Agrupa las respuestas por nombre de usuario
-  const groupedResponses = responses.reduce((acc, current) => {
+  const groupedResponses = responses.reduce((acc: { [key: string]: any[] }, current) => {
     (acc[current.nombre_usuario] = acc[current.nombre_usuario] || []).push(current);
     return acc;
   }, {});
-  
+
   // Convertir las respuestas a un formato que el API pueda entender
   const userResponsesForAI = responses.map(res => ({
     question: allQuestions.find(q => q.id === res.question_id)?.text,
     answer: res.answer_text,
   }));
 
-  const recommendation = await generateRecommendation(userResponsesForAI);
+  const recommendation = await generateRecommendation(userResponsesForAI as any);
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 font-sans">
@@ -51,7 +51,8 @@ export default async function ResultadosPage() {
             </h2>
             <div className="space-y-6">
               {allQuestions.map(q => {
-                const answer = userResponses.find(res => res.question_id === q.id);
+                // Aquí se define el tipo de dato para 'userResponses'
+                const answer = (userResponses as any[]).find(res => res.question_id === q.id);
                 return (
                   <div key={q.id} className="p-4 bg-gray-50 rounded-lg">
                     <p className="font-semibold text-lg text-gray-700">{q.text}</p>
@@ -62,7 +63,7 @@ export default async function ResultadosPage() {
                 );
               })}
             </div>
-            
+
             <div className="mt-8 p-6 bg-green-50 rounded-2xl shadow-inner">
               <h3 className="text-2xl font-bold text-green-700 mb-4">
                 Recomendación de carrera
