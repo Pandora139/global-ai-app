@@ -5,10 +5,14 @@ import { useSearchParams } from 'next/navigation';
 
 export default function ChatClient() {
   const searchParams = useSearchParams();
-  const expertType = searchParams.get('expert');
-  const userName = searchParams.get('user');
+  const expertType = searchParams.get('tipo');
+  const userName = searchParams.get('nombre');
 
-  const [messages, setMessages] = useState([]);
+  // Logs de depuración al cargar la página
+  console.log("🔎 searchParams raw:", searchParams?.toString());
+  console.log("🔎 expertType (cliente):", expertType, " | userName:", userName);
+
+  const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -33,20 +37,27 @@ export default function ChatClient() {
     setIsLoading(true);
     setIsTyping(true);
 
+    // --- Bloque que prepara el payload para el fetch ---
+    const payload = {
+      expertType: expertType || "General",
+      userQuestion: input || "",
+      history: [...messages, userMessage], // incluimos también el último mensaje
+    };
+
+    console.log("📤 Enviando a /api/chat (cliente):", payload);
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          expertType,
-          userQuestion: input,
-          history: messages,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const aiResponse = await response.json();
+      console.log("📥 Respuesta /api/chat (cliente):", aiResponse);
+
       setMessages((prev) => [
         ...prev,
         { type: 'ai', text: aiResponse.answer },

@@ -1,67 +1,95 @@
-import { supabaseServer } from '@/lib/supabaseClient';
-import { notFound } from 'next/navigation';
-import { generateQuestions } from '@/lib/openaiClient';
-import Question from '@/components/Question';
+"use client";
 
-export default async function CuestionarioPage() {
-  const { data: questions, error } = await supabaseServer
-    .from('questions')
-    .select('*')
-    .not('options', 'is', null);
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 
-  if (error) {
-    console.error('Error fetching questions:', error);
-    return notFound();
-  }
+// ⚡ Configura tu cliente Supabase
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-  const { data: responses, error: responsesError } = await supabaseServer
-    .from('responses')
-    .select('question_id, user_name');
+export default function CuestionarioPage() {
+  const router = useRouter();
+  const [nombre, setNombre] = useState("");
+  const [opciones, setOpciones] = useState<string[]>([]);
+  const [seleccion, setSeleccion] = useState("");
 
-  if (responsesError) {
-    console.error('Error fetching responses:', responsesError);
-    return notFound();
-  }
+  // 🔹 Cargar opciones desde Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error } = await supabase
+        .from("questions")
+        .select("options")
+        .eq("text", "Que tipo de experto necesitas?")
+        .single();
 
-  const answeredQuestions = new Set(responses.map(res => res.question_id));
-  const unansweredQuestions = questions.filter(q => !answeredQuestions.has(q.id));
+      if (error) {
+        console.error("Error cargando opciones:", error);
+      } else if (data?.options) {
+        setOpciones(data.options);
+      }
+    };
 
-  let finalQuestions = unansweredQuestions;
+    fetchData();
+  }, []);
 
-  // Lógica para generar preguntas adicionales si es necesario
-  if (unansweredQuestions.length < 5) {
-    try {
-      const questionsFromAI = await generateQuestions(
-        questions.map(q => q.text)
-      );
-      // Asume que las preguntas de la IA tienen un formato compatible
-      finalQuestions = [...unansweredQuestions, ...questionsFromAI];
-    } catch (aiError) {
-      console.error('Error generating AI questions:', aiError);
-      // Si la IA falla, continúa con las preguntas disponibles
+  // 🔹 Manejar envío
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!nombre || !seleccion) {
+      alert("Por favor ingresa tu nombre y selecciona un experto.");
+      return;
     }
-  }
+
+    // 👉 Redirigir a la página del experto con query params
+    router.push(`/experto?nombre=${encodeURIComponent(nombre)}&tipo=${encodeURIComponent(seleccion)}`);
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
-      <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-8 text-center tracking-tight">
-        Responde las preguntas
-      </h1>
-      <div className="w-full max-w-2xl bg-white p-8 rounded-2xl shadow-xl">
-        <form>
-          {finalQuestions.map(q => (
-            <Question key={q.id} question={q} />
-          ))}
-          <div className="mt-8 text-center">
-            <button
-              type="submit"
-              className="w-full py-3 px-6 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105"
-            >
-              Ver mis resultados
-            </button>
-          </div>
-        </form>
-      </div>
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Cuestionario inicial</h1>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Nombre */}
+        <div>
+          <label className="block mb-1 font-medium">Tu nombre</label>
+          <input
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+            placeholder="Escribe tu nombre"
+          />
+        </div>
+
+        {/* Selección de experto */}
+        <div>
+          <label className="block mb-1 font-medium">Selecciona un experto</label>
+          <select
+            value={seleccion}
+            onChange={(e) => setSeleccion(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md"
+          >
+            <option value="">-- Selecciona --</option>
+            {opciones.map((opt, i) => (
+              <option key={i} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Botón */}
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+        >
+          Continuar
+        </button>
+      </form>
     </div>
   );
 }
