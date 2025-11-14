@@ -1,57 +1,55 @@
-import { NextRequest, NextResponse } from "next/server";
+// src/app/api/chat/route.ts
+import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    // 🔹 1. Leer el body crudo
-    const rawBody = await req.text();
-    console.log("Raw body recibido en /api/chat:", rawBody);
+    const body = await req.json().catch(() => ({}));
+    console.log("📥 /api/chat body:", JSON.stringify(body));
 
-    // 🔹 2. Parsear el body
-    const body = JSON.parse(rawBody || "{}");
-    console.log("📥 Parsed body en /api/chat:", body);
+    const { system_prompt = "", messages = [] } = body as {
+      system_prompt?: string;
+      messages?: Array<{ role?: string; content?: string }>;
+    };
 
-    const { messages, tipo } = body;
-
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json(
-        { error: "Formato inválido de mensajes" },
-        { status: 400 }
-      );
+    // Validaciones básicas
+    if (!system_prompt || typeof system_prompt !== "string") {
+      return NextResponse.json({ error: "Missing system_prompt" }, { status: 400 });
+    }
+    if (!Array.isArray(messages)) {
+      return NextResponse.json({ error: "messages must be an array" }, { status: 400 });
     }
 
-    // 🔹 3. Construir los mensajes para OpenAI
-    const finalMessages = [
-      {
-        role: "system",
-        content: `Eres un experto en ${tipo || "temas generales"}. Responde de forma clara y útil.`,
-      },
-      ...messages,
+    // Normalizar mensajes (eliminar vacíos)
+    const safeMessages = messages
+      .map((m) => ({ role: (m.role || "user").toLowerCase(), content: (m.content || "").toString() }))
+      .filter((m) => m.content && m.content.trim().length > 0);
+
+    // Construir mensajes para OpenAI: primero el system prompt
+    const messagesForAI = [
+      { role: "system", content: system_prompt },
+      ...safeMessages.map((m) => ({
+        role: m.role === "assistant" ? "assistant" : "user",
+        content: m.content,
+      })),
     ];
 
-    console.log("🧾 Mensajes que se enviarán a OpenAI:", finalMessages);
+    console.log("🧾 Enviando a OpenAI:", messagesForAI);
 
-    // 🔹 4. Llamar al modelo
+    // Llamada a OpenAI (ajusta modelo si lo necesitas)
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: finalMessages,
+      model: "gpt-4o-mini", // si falla, usa "gpt-3.5-turbo"
+      messages: messagesForAI,
     });
 
-    const reply = completion.choices[0].message?.content || "No tengo respuesta.";
-
+    const reply = completion?.choices?.[0]?.message?.content ?? "No se obtuvo respuesta de la IA.";
     console.log("✅ Respuesta de OpenAI:", reply);
 
-    // 🔹 5. Responder al frontend
     return NextResponse.json({ reply });
-  } catch (error) {
-    console.error("❌ Error en /api/chat:", error);
-    return NextResponse.json(
-      { error: "Error procesando la solicitud" },
-      { status: 500 }
-    );
+  } catch (err: any) {
+    console.error("❌ Error en /api/chat:", err);
+    return NextResponse.json({ error: err?.message || "Error desconocido" }, { status: 500 });
   }
 }

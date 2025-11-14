@@ -1,0 +1,187 @@
+.nexus-dashboard {
+  display: flex;
+  height: 100vh;
+  background: #0f1116;
+  color: white;
+  font-family: 'Inter', sans-serif;
+}
+
+.nexus-sidebar {
+  width: 260px;
+  background: #16191f;
+  padding: 1.5rem;
+  border-right: 1px solid #2b2f3a;
+  overflow-y: auto;
+}
+
+.nexus-logo {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #8cff6b;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 0.9rem;
+  color: #7c7f8b;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.nexus-sidebar ul {
+  list-style: none;
+  padding-left: 0.5rem;
+}
+
+.nexus-sidebar li {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  color: #cfd2dc;
+  transition: all 0.2s;
+}
+
+.nexus-sidebar li:hover {
+  color: #8cff6b;
+}
+
+.expert-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #cfd2dc;
+  padding: 0.4rem 0;
+}
+
+.subexpert-list {
+  padding-left: 1.5rem;
+  margin-top: 0.3rem;
+}
+
+.subexpert-item {
+  font-size: 0.9rem;
+  color: #aab0bd;
+  padding: 0.3rem 0;
+}
+
+.subexpert-item:hover {
+  color: #8cff6b;
+}
+
+.new-item {
+  font-size: 0.85rem;
+  color: #69b2ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.3rem;
+  cursor: pointer;
+}
+
+.nexus-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background: #0056d2;
+}
+
+.btn-secondary {
+  background: #333740;
+  color: #cfd2dc;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #454a55;
+}
+
+.nexus-welcome {
+  text-align: center;
+  margin-top: 20vh;
+}
+
+.nexus-welcome h1 {
+  color: #8cff6b;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* ======================
+   🎯 MENÚ LATERAL ACTIVO
+   ====================== */
+
+.menu-item {
+  @apply flex items-center gap-2 px-3 py-2 rounded-md text-gray-300 cursor-pointer transition-all duration-200;
+}
+
+.menu-item:hover {
+  background-color: rgba(37, 99, 235, 0.1); /* azul translúcido */
+  color: var(--accent);
+}
+
+.menu-item-active {
+  color: var(--accent);
+  background-color: rgba(37, 99, 235, 0.15);
+  border-left: 3px solid var(--accent);
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Animación sutil al hacer hover o seleccionar */
+@keyframes slideAccent {
+  from {
+    border-left-width: 0px;
+    opacity: 0;
+  }
+  to {
+    border-left-width: 3px;
+    opacity: 1;
+  }
+}
+
+.menu-item-active {
+  animation: slideAccent 0.25s ease-in-out;
+}
+
+/* ======================
+   💡 INDICADOR DE MENÚ ACTIVO
+   ====================== */
+
+.menu-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  margin-right: 6px;
+  animation: pulseDot 1.4s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}

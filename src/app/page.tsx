@@ -1,19 +1,38 @@
-import Link from 'next/link';
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getUser();
+
+      if (data?.user) {
+        // 🔹 Usuario autenticado → Enviar al dashboard
+        router.replace("/nexus-dashboard");
+      } else {
+        // 🔹 No autenticado → Enviar a login
+        router.replace("/auth");
+      }
+    };
+
+    checkSession();
+  }, [router]);
+
   return (
-    <>
-      <h1 className="text-5xl font-extrabold text-gray-800 mb-4 tracking-tight">
-        Bienvenido a tu plataforma de IA
-      </h1>
-      <p className="text-lg text-gray-600 mb-8 max-w-2xl text-center">
-        Tu asistente personal de IA. Escoge una funcionalidad en el menú de la izquierda para empezar.
-      </p>
-      <div className="flex space-x-4">
-        <Link href="/cuestionario" className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300">
-          Empezar
-        </Link>
+    <main className="min-h-screen flex items-center justify-center bg-[#0b0c10] text-gray-300">
+      <div className="text-center space-y-3 animate-pulse">
+        <h2 className="text-xl font-semibold text-blue-400">
+          Cargando NEXUS…
+        </h2>
+        <p className="text-gray-500 text-sm">
+          Verificando sesión del usuario
+        </p>
       </div>
-    </>
+    </main>
   );
 }
